@@ -1,4 +1,4 @@
-# Her Universe — free birthday website
+# Her Universe
 
 A mobile-first, interactive 3D galaxy gift made with HTML, CSS and Three.js.
 
