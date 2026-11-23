@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070611">
+<title>Her Universe ✦</title>
+<style>
+:root{--bg:#070611;--lav:#d9c5ff;--pink:#ffb7dc;--muted:#b8afca}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+canvas{position:fixed;inset:0;z-index:0;display:block}
+#veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 48%,transparent 5%,rgba(7,6,17,.15) 48%,rgba(7,6,17,.78) 100%)}
+.top{position:fixed;z-index:3;top:0;left:0;right:0;padding:calc(18px + env(safe-area-inset-top)) 20px 12px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.brand{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#d9c5ffb8}
+.sound{pointer-events:auto;border:1px solid #ffffff2c;color:#eee;background:#ffffff0c;border-radius:99px;padding:9px 12px;font-size:11px;backdrop-filter:blur(12px)}
+.intro{position:fixed;z-index:2;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;pointer-events:none;transition:opacity 1s ease,transform 1s ease}
+.intro.hide{opacity:0;transform:translateY(-18px)}
+.intro-inner{max-width:520px;text-shadow:0 2px 25px #080515}
+.kicker{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:#e7caff;margin-bottom:18px}
+h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(42px,11vw,82px);line-height:.98;margin:0 0 18px;background:linear-gradient(110deg,#fff,#e7caff 45%,#ffb9d8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{font-family:Georgia,serif;font-style:italic;color:#e2d9ee;font-size:clamp(16px,4vw,21px);line-height:1.5;margin:0 auto 28px}
+.primary{pointer-events:auto;border:1px solid #e9d5ff80;border-radius:99px;background:linear-gradient(110deg,#c9a5ff35,#ffb5d52b);color:#fff;padding:14px 24px;font-size:11px;letter-spacing:.19em;text-transform:uppercase;backdrop-filter:blur(14px);box-shadow:0 0 35px #c99bff25;cursor:pointer}
+.hint{position:fixed;z-index:2;bottom:calc(28px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#d5cce4a8;font-size:10px;letter-spacing:.2em;text-transform:uppercase;pointer-events:none;transition:opacity .6s}
+.hint.hide{opacity:0}
+#planet-label{position:fixed;z-index:2;left:50%;bottom:calc(68px + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#f0dfff;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
+.modal{position:fixed;z-index:5;inset:0;display:none;align-items:center;justify-content:center;padding:22px;background:#05040bd9;backdrop-filter:blur(14px)}
+.modal.open{display:flex;animation:fade .35s ease}
+.panel{width:min(100%,430px);max-height:85dvh;overflow:auto;border:1px solid #e7caff45;border-radius:25px;padding:28px 24px 25px;background:linear-gradient(145deg,#211936f2,#100e20f5 65%,#25152cf2);box-shadow:0 20px 100px #0009,0 0 50px #bc8cff18;position:relative;text-align:center}
+.close{position:absolute;right:15px;top:13px;width:35px;height:35px;border-radius:50%;border:1px solid #ffffff2a;background:#ffffff0b;color:#fff;font-size:19px}
+.planet-icon{font-size:34px;margin:5px 0 12px;filter:drop-shadow(0 0 14px #d6a7ff)}
+.panel h2{font-family:Georgia,serif;font-size:34px;font-weight:400;margin:0 0 12px;color:#f4e9ff}
+.panel p{color:#d4cadd;line-height:1.75;font-size:15px;white-space:pre-line;margin:0}
+.panel .small{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#cba9f3;margin:0 0 14px}
+.panel .foot{margin-top:22px;font-family:Georgia,serif;font-style:italic;color:#f2c9e4;font-size:15px}
+.controls{position:fixed;z-index:3;right:16px;bottom:calc(24px + env(safe-area-inset-bottom));display:flex;gap:8px;opacity:0;transition:opacity .6s}
+.controls.show{opacity:1}
+.ctrl{border:1px solid #ffffff32;border-radius:50%;width:42px;height:42px;background:#ffffff0c;color:#fff;backdrop-filter:blur(12px);font-size:16px}
+#toast{position:fixed;z-index:6;top:75px;left:50%;transform:translateX(-50%);border:1px solid #ffffff30;background:#171126d9;padding:10px 15px;border-radius:99px;font-size:11px;color:#f2e8ff;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+@keyframes fade{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+@media(min-width:700px){.top{padding-left:35px;padding-right:35px}.hint{bottom:32px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+</head>
+<body>
+<div id="veil"></div>
+<div class="top"><div class="brand">✦ A universe of her own</div><button class="sound" id="soundBtn">♫ SOUND OFF</button></div>
+<section class="intro" id="intro"><div class="intro-inner">
+<div class="kicker">A little place in the cosmos</div>
+<h1 id="heroTitle">Her<br>Universe</h1>
+<p class="subtitle" id="heroSub">Somewhere among a billion stars,<br>there is one universe that is entirely yours.</p>
+<button class="primary" id="enterBtn">ENTER YOUR UNIVERSE&nbsp; ✦</button>
+</div></section>
+<div class="hint" id="hint">Drag to explore · Tap a glowing planet</div>
+<div id="planet-label"></div>
+<div class="controls" id="controls">
+<button class="ctrl" id="homeBtn" aria-label="Return to galaxy">⌂</button>
+<button class="ctrl" id="helpBtn" aria-label="How to explore">?</button>
+</div>
+<div class="modal" id="modal"><div class="panel">
+<button class="close" id="closeBtn" aria-label="Close">×</button>
+<div class="planet-icon" id="mIcon">✦</div><div class="small" id="mEyebrow">A little piece of us</div>
+<h2 id="mTitle">A memory</h2><p id="mBody"></p><div class="foot" id="mFoot"></div>
+</div></div>
+<div id="toast"></div>
+<script type="module">
+import * as THREE from 'three';
+
+/* PERSONALISE THIS SECTION.
+   Change herName, yourName and each planet's title/message.
+   Keep the quotation marks and commas in place. */
+const CONFIG = {
+  herName: "Sharu",
+  yourName: "Swami",
+  welcome: "Somewhere among a billion stars,\nthere is one universe that feels like home — because it has you in it.",
+  planets: [
+    {name:"The First Spark", icon:"☄️", color:0xffb3d9, eyebrow:"The beginning of my favourite story", title:"The first spark", message:"If the universe is full of endless possibilities, then meeting you is one of the most beautiful things that ever happened in mine.\n\nSomehow, in this huge world, I found someone whose little smile can change my whole day. And I would choose that beginning, again and again.", foot:"Some beginnings become everything."},
+    {name:"Your Magic", icon:"🌙", color:0xbba4ff, eyebrow:"The little things that make you, you", title:"Your beautiful kind of magic", message:"Sharu, you have this soft, lovely way of making the world feel gentler. Your caring heart, your adorable little ways, your innocence, and that mischievous side that keeps me smiling — every part of you is precious to me.\n\nYou feel deeply, you care sincerely, and you make ordinary moments feel special without even trying. Please never think you need to change the beautiful heart you have.\n\nYou are beautiful beyond what a mirror could ever show.", foot:"My favourite kind of magic will always be you."},
+    {name:"Our Memories", icon:"💫", color:0x86d8ff, eyebrow:"A little secret written in the stars", title:"The night only we know", message:"There is one night that belongs only to us. No explanations, no audience, no need for the world to understand.\n\nJust the two of us, and a memory that can stay quietly tucked away in our hearts. Whenever I think of it, I smile — because some moments are too special to explain to anyone else.\n\nLet the stars keep that little secret for us.", foot:"Some memories don't need words. They just need us."},
+    {name:"Your Dreams", icon:"🪐", color:0xffcf8c, eyebrow:"Everything beautiful I wish for you", title:"The universe is yours", message:"I hope you always have reasons to smile, courage when things feel difficult, and people who treat your gentle heart with the care it deserves.\n\nI hope every dream you quietly carry finds its way into your life. May you keep growing, laughing, exploring, and discovering just how wonderful you are.\n\nAnd on the days you feel sensitive or overwhelmed, I hope you remember that feeling deeply is not a weakness. It is part of what makes you you.", foot:"You deserve a universe full of beautiful things."},
+    {name:"My Secret", icon:"💗", color:0xff83c8, eyebrow:"Something I want you to always remember", title:"You are my peace", message:"You are my peace in the middle of a noisy world. You are the smile I look forward to, the person whose little messages can make a day brighter, and the one whose happiness matters so much to me.\n\nI love your caring heart, your cute mischief, your softness, your laughter, and even the tiny things you probably don't notice about yourself. I don't love just one version of you — I love the whole, wonderfully imperfect, completely special you.\n\nThank you for being my Sharu.", foot:"If I had to find home in a person, it would feel like you."},
+    {name:"Birthday Star", icon:"🎂", color:0xffe6a1, eyebrow:"Today, the whole universe celebrates you", title:"Happy Birthday, Sharu", message:"Happy Birthday, my beautiful Sharu. ❤️\n\nI wish I could place every star in the sky around you, just to show you how much light you bring into my life. Since I couldn't give you the universe, I made this little one for you — with a place for your magic, our memories, your dreams, and all the things I sometimes struggle to put into words.\n\nKeep being cute, caring, wonderfully mischievous, and beautifully you. Keep that pure heart. Keep dreaming big. And whenever life feels heavy, come back here and remember: you are loved, you are precious, and you make my world brighter.\n\nI hope this year is gentle with you and gives you a thousand reasons to smile.", foot:"With all my love, Swami ❤️"}
+  ]
+};
+
+document.title = `${CONFIG.herName} — Her Universe`;
+document.getElementById('heroTitle').innerHTML = `${escapeHtml(CONFIG.herName)}<br>Universe`;
+document.getElementById('heroSub').textContent = CONFIG.welcome.replace(/\\n/g,"\n");
+document.getElementById('mFoot').textContent = `With love, ${CONFIG.yourName}`;
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x070611,0.012);
+const camera = new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,150);
+camera.position.set(0,3.2,17);
+const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0x9c8acb,1.2));
+const keyLight=new THREE.PointLight(0xd9b7ff,90,60);keyLight.position.set(-5,7,8);scene.add(keyLight);
+const pinkLight=new THREE.PointLight(0xff8fc9,55,50);pinkLight.position.set(7,-3,-5);scene.add(pinkLight);
+
+const galaxy=new THREE.Group();scene.add(galaxy);
+const starGeo=new THREE.BufferGeometry(), starCount=2300, positions=new Float32Array(starCount*3), sizes=new Float32Array(starCount);
+for(let i=0;i<starCount;i++){const r=18+Math.random()*75, a=Math.random()*Math.PI*2, y=(Math.random()-.5)*55;positions[i*3]=Math.cos(a)*r;positions[i*3+1]=y;positions[i*3+2]=Math.sin(a)*r-25;sizes[i]=Math.random()*1.7+.3;}
+starGeo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+const stars=new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xe5d8ff,size:.12,transparent:true,opacity:.85,sizeAttenuation:true}));
+scene.add(stars);
+
+const nebula=new THREE.Group();scene.add(nebula);
+for(let i=0;i<8;i++){const mesh=new THREE.Mesh(new THREE.SphereGeometry(5+i*.65,24,16),new THREE.MeshBasicMaterial({color:[0x4e277b,0x742d68,0x293d7e][i%3],transparent:true,opacity:.035,side:THREE.BackSide,depthWrite:false}));mesh.position.set(Math.sin(i*2)*7,Math.cos(i*1.7)*3,-15-i*1.4);mesh.scale.set(1.6,.48,1);nebula.add(mesh);}
+
+const core=new THREE.Group();galaxy.add(core);
+const sun=new THREE.Mesh(new THREE.SphereGeometry(1.25,48,48),new THREE.MeshStandardMaterial({color:0xffc5e5,emissive:0xb44c9b,emissiveIntensity:1.9,roughness:.3,metalness:.1}));
+core.add(sun);
+const halo=new THREE.Mesh(new THREE.SphereGeometry(1.65,32,32),new THREE.MeshBasicMaterial({color:0xd58cff,transparent:true,opacity:.10,side:THREE.BackSide}));core.add(halo);
+const sunLight=new THREE.PointLight(0xffb7df,95,32);core.add(sunLight);
+
+const planetObjects=[];
+const orbitGroup=new THREE.Group();galaxy.add(orbitGroup);
+CONFIG.planets.forEach((p,i)=>{
+  const angle=i/CONFIG.planets.length*Math.PI*2;
+  const radius=3.2+(i%3)*1.2;
+  const group=new THREE.Group();group.rotation.y=angle;orbitGroup.add(group);
+  const pivot=new THREE.Group();pivot.position.x=radius;group.add(pivot);
+  const size=.36+(i%3)*.09;
+  const mat=new THREE.MeshStandardMaterial({color:p.color,emissive:p.color,emissiveIntensity:.35,roughness:.48,metalness:.18});
+  const sphere=new THREE.Mesh(new THREE.SphereGeometry(size,32,32),mat);pivot.add(sphere);
+  const glow=new THREE.Mesh(new THREE.SphereGeometry(size*1.55,20,20),new THREE.MeshBasicMaterial({color:p.color,transparent:true,opacity:.13,side:THREE.BackSide}));pivot.add(glow);
+  if(i===3||i===5){const ring=new THREE.Mesh(new THREE.RingGeometry(size*1.35,size*1.9,48),new THREE.MeshBasicMaterial({color:p.color,transparent:true,opacity:.55,side:THREE.DoubleSide}));ring.rotation.x=Math.PI/2.5;ring.rotation.y=.25;pivot.add(ring);}
+  const orbit=new THREE.Mesh(new THREE.RingGeometry(radius-.006,radius+.006,128),new THREE.MeshBasicMaterial({color:0xb99bdc,transparent:true,opacity:.16,side:THREE.DoubleSide}));orbit.rotation.x=Math.PI/2;orbitGroup.add(orbit);
+  sphere.userData.planetIndex=i;glow.userData.planetIndex=i;
+  planetObjects.push({p,group,pivot,sphere,glow,angle,radius});
+});
+
+const raycaster=new THREE.Raycaster();raycaster.params.Points.threshold=.3;
+const pointer=new THREE.Vector2();
+let entered=false,dragging=false,lastX=0,lastY=0,rotationY=0,rotationX=0,targetY=0,targetX=0,activePlanet=-1;
+const label=document.getElementById('planet-label');
+const modal=document.getElementById('modal');
+function showPlanet(i){const p=CONFIG.planets[i];document.getElementById('mIcon').textContent=p.icon;document.getElementById('mEyebrow').textContent=p.eyebrow;document.getElementById('mTitle').textContent=p.title;document.getElementById('mBody').textContent=p.message;document.getElementById('mFoot').textContent=p.foot||`With love, ${CONFIG.yourName}`;modal.classList.add('open');}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
+function enter(){if(entered)return;entered=true;document.getElementById('intro').classList.add('hide');document.getElementById('hint').classList.add('hide');document.getElementById('controls').classList.add('show');camera.position.set(0,4,13);toast('Welcome to your universe ✦');}
+document.getElementById('enterBtn').addEventListener('click',enter);
+document.getElementById('closeBtn').addEventListener('click',()=>modal.classList.remove('open'));
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
+document.getElementById('homeBtn').addEventListener('click',()=>{modal.classList.remove('open');targetY=0;targetX=0;camera.position.set(0,4,13);toast('Back to the galaxy ✦')});
+document.getElementById('helpBtn').addEventListener('click',()=>toast('Drag to look around. Tap a glowing planet to open it.'));
+let audioCtx=null,osc=null,gain=null,soundOn=false;
+document.getElementById('soundBtn').addEventListener('click',()=>{
+  if(!soundOn){try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();osc=audioCtx.createOscillator();gain=audioCtx.createGain();osc.type='sine';osc.frequency.value=110;gain.gain.value=.012;osc.connect(gain);gain.connect(audioCtx.destination);osc.start();soundOn=true;document.getElementById('soundBtn').textContent='♫ SOUND ON';}catch(e){toast('Audio is unavailable in this browser.')}}else{osc?.stop();audioCtx?.close();soundOn=false;document.getElementById('soundBtn').textContent='♫ SOUND OFF';}
+});
+function pointerDown(e){dragging=true;lastX=e.clientX;lastY=e.clientY;}
+function pointerMove(e){if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;targetY+=dx*.006;targetX=Math.max(-.45,Math.min(.45,targetX+dy*.003));lastX=e.clientX;lastY=e.clientY;}
+function pointerUp(e){if(!dragging)return;dragging=false;const dx=e.clientX-lastX,dy=e.clientY-lastY;pointer.x=(e.clientX/innerWidth)*2-1;pointer.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(planetObjects.flatMap(o=>[o.sphere,o.glow]));if(hits.length&&entered){const idx=hits[0].object.userData.planetIndex;if(idx!==undefined)showPlanet(idx);}}
+renderer.domElement.addEventListener('pointerdown',pointerDown);
+renderer.domElement.addEventListener('pointermove',pointerMove);
+renderer.domElement.addEventListener('pointerup',pointerUp);
+renderer.domElement.addEventListener('pointercancel',()=>dragging=false);
+renderer.domElement.addEventListener('pointerleave',()=>dragging=false);
+renderer.domElement.addEventListener('click',e=>{if(!entered)return;pointer.x=(e.clientX/innerWidth)*2-1;pointer.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(planetObjects.map(o=>o.sphere));if(hits.length){const idx=hits[0].object.userData.planetIndex;showPlanet(idx);}});
+function resize(){camera.aspect=innerWidth/innerHeight;camera.fov=innerWidth<600?65:55;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));}
+addEventListener('resize',resize);
+const clock=new THREE.Clock();
+function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();rotationY+=(targetY-rotationY)*.035;rotationX+=(targetX-rotationX)*.035;galaxy.rotation.y=rotationY+Math.sin(t*.08)*.08;galaxy.rotation.x=rotationX;sun.rotation.y=t*.12;halo.scale.setScalar(1+Math.sin(t*1.2)*.035);stars.rotation.y=t*.003;nebula.rotation.y=-t*.008;
+planetObjects.forEach((o,i)=>{o.group.rotation.y=o.angle+t*(.045+i*.004);o.sphere.rotation.y=t*.25+i;o.sphere.rotation.x=Math.sin(t*.3+i)*.08;o.glow.material.opacity=.10+Math.sin(t*1.7+i)*.035;});
+camera.position.x+=(Math.sin(t*.08)*.55-camera.position.x)*.003;camera.lookAt(0,0,0);renderer.render(scene,camera);}
+animate();
+</script>
+</body>
+</html>
